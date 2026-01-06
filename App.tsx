@@ -22,8 +22,9 @@ export default function App() {
   const [previousScreen, setPreviousScreen] = useState('home');
   const [isMenuVisible, setMenuVisible] = useState(false);
   
-  // Search State (Lifted)
+  // Search and Filter State
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   // Auth State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -48,10 +49,9 @@ export default function App() {
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setShowLoginModal(false);
-    if (pendingNavigation) {
-        handleNavigation(pendingNavigation);
-        setPendingNavigation(null);
-    }
+    // Explicitly redirect to profile as requested by the user
+    handleNavigation('profile');
+    setPendingNavigation(null);
   };
 
   // Cart Helper Functions
@@ -146,21 +146,23 @@ export default function App() {
   };
 
   const handleNavigation = (screen: string) => {
-    // Intercept profile navigation for auth check
     if (screen === 'profile' && !isLoggedIn) {
         handleAuthGuard('profile');
         return;
     }
-
     if (screen === 'compare') {
         setCompareItem(null);
     }
-    // Update previous screen logic to allow going back from tabs naturally
     setPreviousScreen(currentScreen);
     setCurrentScreen(screen);
   };
 
-  // Search Logic (Header triggered)
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setGlobalSearchQuery(''); // Clear search when picking a category
+    handleNavigation('store');
+  };
+
   const handleSearchSubmit = (query: string) => {
     setGlobalSearchQuery(query);
     if (query.trim().length > 0) {
@@ -168,37 +170,28 @@ export default function App() {
     }
   };
 
-  // Filter Data for Home Screen Sections
   const bestSellers = ALL_PRODUCTS.filter(p => p.rating >= 4.8).slice(0, 6);
   const notebooks = ALL_PRODUCTS.filter(p => p.category === 'Notebook').slice(0, 6);
   const gpus = ALL_PRODUCTS.filter(p => p.category === 'GPU').slice(0, 6);
 
-  return (
-    <div className="max-w-md mx-auto w-full h-[100dvh] bg-background-light dark:bg-background-dark relative shadow-2xl overflow-hidden flex flex-col">
-      {/* Show Header on Home and Store screens */}
-      {(currentScreen === 'home' || currentScreen === 'store') && (
-        <Header 
-          cartCount={totalCartItems} 
-          onCartClick={() => setCurrentScreen('cart')}
-          onMenuClick={() => setMenuVisible(true)}
-          initialQuery={globalSearchQuery}
-          onSearchSubmit={handleSearchSubmit}
-        />
-      )}
-      
-      {currentScreen === 'detail' ? (
-        <ProductDetail 
-          product={selectedProduct} 
-          onBack={handleBack} 
-          onAddToCart={addToCart}
-          cartItemCount={totalCartItems}
-          onCartPress={() => setCurrentScreen('cart')}
-          onComparePress={handleComparePress}
-          isWishlisted={selectedProduct ? isProductWishlisted(selectedProduct.id) : false}
-          onToggleWishlist={() => selectedProduct && toggleWishlist(selectedProduct)}
-        />
-      ) : currentScreen === 'compare' ? (
-        <Compare 
+  const renderCurrentScreen = () => {
+    switch (currentScreen) {
+      case 'detail':
+        return (
+          <ProductDetail 
+            product={selectedProduct} 
+            onBack={handleBack} 
+            onAddToCart={addToCart}
+            cartItemCount={totalCartItems}
+            onCartPress={() => setCurrentScreen('cart')}
+            onComparePress={handleComparePress}
+            isWishlisted={selectedProduct ? isProductWishlisted(selectedProduct.id) : false}
+            onToggleWishlist={() => selectedProduct && toggleWishlist(selectedProduct)}
+          />
+        );
+      case 'compare':
+        return (
+          <Compare 
             productA={compareItem ? selectedProduct : null}
             productB={compareItem ? compareItem : null}
             onBack={() => {
@@ -215,174 +208,153 @@ export default function App() {
             cartItemCount={totalCartItems}
             onCartClick={() => setCurrentScreen('cart')}
             allProducts={ALL_PRODUCTS}
-        />
-      ) : currentScreen === 'cart' ? (
-        <Cart 
-          cartItems={cartItems}
-          onUpdateQuantity={updateQuantity}
-          onRemoveItem={removeFromCart}
-          onBack={() => setCurrentScreen('home')}
-          onCheckoutPress={() => handleAuthGuard('checkout')}
-          onItemPress={handleCartItemPress}
-          isLoggedIn={isLoggedIn}
-        />
-      ) : currentScreen === 'checkout' ? (
-        <Checkout 
-          totalAmount={cartTotalAmount}
-          onBack={() => setCurrentScreen('cart')}
-          onPlaceOrder={handlePlaceOrder}
-        />
-      ) : currentScreen === 'wishlist' ? (
-        <Wishlist 
-          wishlistItems={wishlistItems}
-          onRemove={(id) => {
-             const product = wishlistItems.find(i => i.id === id);
-             if (product) toggleWishlist(product);
-          }}
-          onAddToCart={(product) => {
-             addToCart(product);
-             alert(`Added ${product.title} to cart`);
-          }}
-          onNavigate={handleNavigation}
-          onBack={() => setCurrentScreen('home')}
-          cartItemCount={totalCartItems}
-          onCartPress={() => setCurrentScreen('cart')}
-          onProductPress={handleProductSelect}
-          onSearchPress={() => setCurrentScreen('store')}
-        />
-      ) : currentScreen === 'profile' ? (
-        <Profile 
-          onNavigate={handleNavigation}
-          onLogout={() => {
-            setIsLoggedIn(false);
-            setCurrentScreen('home');
-            alert('You have been logged out.');
-          }}
-        />
-      ) : currentScreen === 'home' ? (
-        <main className="flex-1 w-full overflow-y-auto no-scrollbar pt-16 pb-32">
-          <HeroBanner onShopNow={() => setCurrentScreen('store')} />
-          
-          <DailyDeal onPress={handleProductSelect} />
-          
-          <BrandsStrip onBrandSelect={handleSearchSubmit} />
-          
-          {/* 1. Best Sellers Section */}
-          <section className="mt-4 pt-4">
-            <div className="flex items-center justify-between px-4 pb-4">
-              <h2 className="text-[#111318] dark:text-white text-[20px] font-bold leading-tight">
-                Best Sellers
-              </h2>
-              <button 
-                onClick={() => setCurrentScreen('store')}
-                className="text-primary text-sm font-medium"
-              >
-                View All
-              </button>
-            </div>
-            <div className="flex overflow-x-auto gap-4 px-4 pb-6 no-scrollbar snap-x snap-mandatory">
-              {bestSellers.map(product => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  onPress={handleProductSelect}
-                  onAddToCart={addToCart}
-                  isWishlisted={isProductWishlisted(product.id)}
-                  onToggleWishlist={toggleWishlist}
-                />
-              ))}
-            </div>
-          </section>
+            onMenuClick={() => setMenuVisible(true)}
+            onLogoClick={() => handleNavigation('home')}
+          />
+        );
+      case 'cart':
+        return (
+          <Cart 
+            cartItems={cartItems}
+            onUpdateQuantity={updateQuantity}
+            onRemoveItem={removeFromCart}
+            onBack={() => setCurrentScreen('home')}
+            onCheckoutPress={() => handleAuthGuard('checkout')}
+            onItemPress={handleCartItemPress}
+            isLoggedIn={isLoggedIn}
+          />
+        );
+      case 'checkout':
+        return (
+          <Checkout 
+            totalAmount={cartTotalAmount}
+            onBack={() => setCurrentScreen('cart')}
+            onPlaceOrder={handlePlaceOrder}
+          />
+        );
+      case 'wishlist':
+        return (
+          <Wishlist 
+            wishlistItems={wishlistItems}
+            onRemove={(id) => {
+               const product = wishlistItems.find(i => i.id === id);
+               if (product) toggleWishlist(product);
+            }}
+            onAddToCart={(product) => {
+               addToCart(product);
+               alert(`Added ${product.title} to cart`);
+            }}
+            onNavigate={handleNavigation}
+            onBack={() => setCurrentScreen('home')}
+            cartItemCount={totalCartItems}
+            onCartPress={() => setCurrentScreen('cart')}
+            onProductPress={handleProductSelect}
+            onSearchPress={() => setCurrentScreen('store')}
+            onMenuClick={() => setMenuVisible(true)}
+          />
+        );
+      case 'profile':
+        return (
+          <Profile 
+            onNavigate={handleNavigation}
+            onLogout={() => {
+              setIsLoggedIn(false);
+              setCurrentScreen('home');
+              alert('You have been logged out.');
+            }}
+          />
+        );
+      case 'store':
+        return (
+          <Store 
+            onProductSelect={handleProductSelect} 
+            onAddToCart={addToCart}
+            wishlistItems={wishlistItems}
+            onToggleWishlist={toggleWishlist}
+            searchQuery={globalSearchQuery}
+            setSearchQuery={setGlobalSearchQuery}
+            activeCategory={selectedCategory}
+            setActiveCategory={setSelectedCategory}
+          />
+        );
+      case 'home':
+      default:
+        return (
+          <main className="flex-1 w-full overflow-y-auto no-scrollbar pt-16 pb-32 animate-in fade-in duration-500">
+            <HeroBanner onShopNow={() => setCurrentScreen('store')} />
+            <DailyDeal onPress={handleProductSelect} onSeeAll={() => setCurrentScreen('store')} />
+            <BrandsStrip onBrandSelect={handleSearchSubmit} />
+            
+            <section className="mt-4 pt-4">
+              <div className="flex items-center justify-between px-4 pb-4">
+                <h2 className="text-[#111318] dark:text-white text-[20px] font-bold leading-tight">Best Sellers</h2>
+                <button onClick={() => setCurrentScreen('store')} className="text-primary text-sm font-medium">View All</button>
+              </div>
+              <div className="flex overflow-x-auto gap-4 px-4 pb-6 no-scrollbar snap-x snap-mandatory">
+                {bestSellers.map(product => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    onPress={handleProductSelect}
+                    onAddToCart={addToCart}
+                    isWishlisted={isProductWishlisted(product.id)}
+                    onToggleWishlist={toggleWishlist}
+                  />
+                ))}
+              </div>
+            </section>
 
-          {/* 2. Notebooks Section */}
-          <section className="mt-2 pt-4">
-            <div className="flex items-center justify-between px-4 pb-4">
-              <h2 className="text-[#111318] dark:text-white text-[20px] font-bold leading-tight">
-                Notebooks
-              </h2>
-              <button 
-                onClick={() => setCurrentScreen('store')}
-                className="text-primary text-sm font-medium"
-              >
-                View All
-              </button>
-            </div>
-            <div className="flex overflow-x-auto gap-4 px-4 pb-6 no-scrollbar snap-x snap-mandatory">
-              {notebooks.map(product => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  onPress={handleProductSelect}
-                  onAddToCart={addToCart}
-                  isWishlisted={isProductWishlisted(product.id)}
-                  onToggleWishlist={toggleWishlist}
-                />
-              ))}
-            </div>
-          </section>
+            <section className="mt-2 pt-4">
+              <div className="flex items-center justify-between px-4 pb-4">
+                <h2 className="text-[#111318] dark:text-white text-[20px] font-bold leading-tight">Notebooks</h2>
+                <button onClick={() => setCurrentScreen('store')} className="text-primary text-sm font-medium">View All</button>
+              </div>
+              <div className="flex overflow-x-auto gap-4 px-4 pb-6 no-scrollbar snap-x snap-mandatory">
+                {notebooks.map(product => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    onPress={handleProductSelect}
+                    onAddToCart={addToCart}
+                    isWishlisted={isProductWishlisted(product.id)}
+                    onToggleWishlist={toggleWishlist}
+                  />
+                ))}
+              </div>
+            </section>
+          </main>
+        );
+    }
+  };
 
-          {/* 3. GPU Series Section */}
-          <section className="mt-2 pt-4">
-            <div className="flex items-center justify-between px-4 pb-4">
-              <h2 className="text-[#111318] dark:text-white text-[20px] font-bold leading-tight">
-                GPU Series
-              </h2>
-              <button 
-                onClick={() => setCurrentScreen('store')}
-                className="text-primary text-sm font-medium"
-              >
-                View All
-              </button>
-            </div>
-            <div className="flex overflow-x-auto gap-4 px-4 pb-6 no-scrollbar snap-x snap-mandatory">
-              {gpus.map(product => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  onPress={handleProductSelect}
-                  onAddToCart={addToCart}
-                  isWishlisted={isProductWishlisted(product.id)}
-                  onToggleWishlist={toggleWishlist}
-                />
-              ))}
-            </div>
-          </section>
-        </main>
-      ) : currentScreen === 'store' ? (
-        <Store 
-          onProductSelect={handleProductSelect} 
-          onAddToCart={addToCart}
-          wishlistItems={wishlistItems}
-          onToggleWishlist={toggleWishlist}
-          searchQuery={globalSearchQuery}
-          setSearchQuery={setGlobalSearchQuery}
+  return (
+    <div className="max-w-md mx-auto w-full h-[100dvh] bg-background-light dark:bg-background-dark relative shadow-2xl overflow-hidden flex flex-col">
+      {(currentScreen === 'home' || currentScreen === 'store') && (
+        <Header 
+          cartCount={totalCartItems} 
+          onCartClick={() => setCurrentScreen('cart')}
+          onMenuClick={() => setMenuVisible(true)}
+          onLogoClick={() => handleNavigation('home')}
+          initialQuery={globalSearchQuery}
+          onSearchSubmit={handleSearchSubmit}
         />
-      ) : (
-        <div className="flex-1 flex items-center justify-center text-gray-500">
-          Work in progress
-        </div>
       )}
+      
+      <div className="flex-1 relative overflow-hidden flex flex-col">
+        {renderCurrentScreen()}
+      </div>
       
       {(currentScreen !== 'detail' && currentScreen !== 'cart' && currentScreen !== 'checkout') && (
         <BottomNavigation activeTab={currentScreen} onNavigate={handleNavigation} />
       )}
 
-      {/* Side Menu Overlay */}
       <SideMenu 
-        visible={isMenuVisible}
-        onClose={() => setMenuVisible(false)}
-        onNavigate={handleNavigation}
+        visible={isMenuVisible} 
+        onClose={() => setMenuVisible(false)} 
+        onNavigate={handleNavigation} 
+        onCategorySelect={handleCategorySelect}
       />
-
-      {/* Auth Modal Overlay */}
-      <LoginModal 
-        visible={showLoginModal} 
-        onClose={() => {
-            setShowLoginModal(false);
-            setPendingNavigation(null);
-        }}
-        onLoginSuccess={handleLoginSuccess}
-      />
+      <LoginModal visible={showLoginModal} onClose={() => { setShowLoginModal(false); setPendingNavigation(null); }} onLoginSuccess={handleLoginSuccess} />
     </div>
   );
 }

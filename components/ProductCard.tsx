@@ -17,10 +17,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isWishlisted = false,
   onToggleWishlist
 }) => {
+  const isDiscounted = !!product.originalPrice;
+
   return (
     <div 
       onClick={() => onPress(product)}
-      className="flex flex-col shrink-0 w-[180px] snap-center bg-white dark:bg-neutral-800 rounded-xl overflow-hidden shadow-sm cursor-pointer group hover:shadow-md transition-all duration-300"
+      className="flex flex-col shrink-0 w-[180px] snap-center bg-white dark:bg-neutral-800 rounded-xl overflow-hidden shadow-sm cursor-pointer group hover:shadow-md transition-all duration-300 animate-in fade-in zoom-in-95"
     >
       {/* Image Section */}
       <div className="relative w-full h-[140px] bg-gray-50 dark:bg-neutral-900 overflow-hidden">
@@ -71,7 +73,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         <div className="mt-auto pt-2 flex items-center justify-between">
           <div className="flex flex-col leading-none">
-            <span className={`text-sm font-bold ${product.originalPrice ? 'text-red-500' : 'text-primary'}`}>
+            <span className={`text-sm font-bold ${isDiscounted ? 'text-red-500' : 'text-primary'}`}>
               ${product.price.toLocaleString()}
             </span>
             {product.originalPrice && (
@@ -81,7 +83,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
           
-          {/* New Clean Circle Add Button */}
           <button 
             onClick={(e) => {
               e.stopPropagation();

@@ -4,6 +4,7 @@ import { Product } from '../types';
 
 interface DailyDealProps {
   onPress?: (product: Product) => void;
+  onSeeAll?: () => void;
 }
 
 // Mock Data for Flash Deals
@@ -46,7 +47,7 @@ const FLASH_DEALS: Product[] = [
   }
 ];
 
-export const DailyDeal: React.FC<DailyDealProps> = ({ onPress }) => {
+export const DailyDeal: React.FC<DailyDealProps> = ({ onPress, onSeeAll }) => {
   // Countdown Timer State
   const [timeLeft, setTimeLeft] = useState(2 * 60 * 60 + 44 * 60 + 50);
 
@@ -83,7 +84,12 @@ export const DailyDeal: React.FC<DailyDealProps> = ({ onPress }) => {
             </div>
           </div>
         </div>
-        <button className="text-xs font-bold text-gray-400 hover:text-primary transition-colors">See All</button>
+        <button 
+          onClick={onSeeAll}
+          className="text-xs font-bold text-gray-400 hover:text-primary transition-colors px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-800"
+        >
+          See All
+        </button>
       </div>
 
       {/* Horizontal List */}

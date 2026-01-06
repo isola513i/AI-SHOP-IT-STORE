@@ -6,6 +6,7 @@ interface HeaderProps {
   onCartClick?: () => void;
   title?: string;
   onMenuClick?: () => void;
+  onLogoClick?: () => void;
   
   // Search Props
   onSearchSubmit?: (query: string) => void;
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   onCartClick, 
   title = "AI-SHOP",
   onMenuClick,
+  onLogoClick,
   onSearchSubmit,
   initialQuery = '',
   onSearchClick
@@ -69,22 +71,26 @@ export const Header: React.FC<HeaderProps> = ({
         
         {/* Normal Header Content */}
         <div 
-            className={`absolute inset-0 flex items-center justify-between px-4 transition-all duration-300 ease-in-out ${
+            className={`absolute inset-0 flex items-center px-4 transition-all duration-300 ease-in-out ${
                 isSearchActive ? 'opacity-0 translate-y-[-10px] pointer-events-none' : 'opacity-100 translate-y-0'
             }`}
         >
             <button 
                 onClick={onMenuClick}
-                className="p-2 -ml-2 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm"
+                className="p-2 -ml-2 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm shrink-0"
             >
                 <Menu size={28} />
             </button>
             
-            <div className="text-xl font-bold tracking-tight text-white drop-shadow-md">
+            {/* Centered Clickable Logo */}
+            <button 
+                onClick={onLogoClick}
+                className="absolute left-1/2 -translate-x-1/2 text-xl font-bold tracking-tight text-white drop-shadow-md hover:opacity-80 active:scale-95 transition-all"
+            >
                 {title}
-            </div>
+            </button>
             
-            <div className="flex items-center gap-1">
+            <div className="ml-auto flex items-center gap-1 shrink-0">
                 <button 
                     onClick={handleSearchClick}
                     className="p-2 text-white hover:bg-white/20 rounded-full transition-colors backdrop-blur-sm"

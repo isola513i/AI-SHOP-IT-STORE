@@ -13,6 +13,7 @@ interface WishlistProps {
   onCartPress: () => void;
   onProductPress: (product: Product) => void;
   onSearchPress: () => void;
+  onMenuClick?: () => void;
 }
 
 export const Wishlist: React.FC<WishlistProps> = ({ 
@@ -24,7 +25,8 @@ export const Wishlist: React.FC<WishlistProps> = ({
   cartItemCount,
   onCartPress,
   onProductPress,
-  onSearchPress
+  onSearchPress,
+  onMenuClick
 }) => {
   
   // Helper to simulate stock status for demo purposes
@@ -42,6 +44,7 @@ export const Wishlist: React.FC<WishlistProps> = ({
         cartCount={cartItemCount} 
         onCartClick={onCartPress}
         onSearchClick={onSearchPress}
+        onMenuClick={onMenuClick}
       />
 
       {/* Scrollable Content with padding for fixed Header and Bottom Nav */}

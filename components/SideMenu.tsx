@@ -5,11 +5,17 @@ interface SideMenuProps {
   visible: boolean;
   onClose: () => void;
   onNavigate: (screen: string) => void;
+  onCategorySelect: (category: string) => void;
 }
 
-export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose, onNavigate }) => {
+export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose, onNavigate, onCategorySelect }) => {
   const handleNav = (screen: string) => {
     onNavigate(screen);
+    onClose();
+  };
+
+  const handleCatClick = (category: string) => {
+    onCategorySelect(category);
     onClose();
   };
 
@@ -47,28 +53,28 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose, onNavigate
           <div className="px-4 py-4">
             <h3 className="px-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Shop by Category</h3>
             <div className="flex flex-col gap-1">
-              <button onClick={() => handleNav('store')} className="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group">
+              <button onClick={() => handleCatClick('GPU')} className="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group text-left">
                 <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
                   <Cpu size={20} />
                 </div>
                 <span className="font-medium text-gray-200 group-hover:text-white">GPUs & Components</span>
               </button>
               
-              <button onClick={() => handleNav('store')} className="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group">
+              <button onClick={() => handleCatClick('Notebook')} className="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group text-left">
                 <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
                   <Smartphone size={20} />
                 </div>
                 <span className="font-medium text-gray-200 group-hover:text-white">Laptops & Phones</span>
               </button>
 
-              <button onClick={() => handleNav('store')} className="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group">
+              <button onClick={() => handleCatClick('All')} className="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group text-left">
                 <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
                   <Monitor size={20} />
                 </div>
                 <span className="font-medium text-gray-200 group-hover:text-white">Monitors</span>
               </button>
 
-              <button onClick={() => handleNav('store')} className="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group">
+              <button onClick={() => handleCatClick('Accessory')} className="flex items-center gap-4 px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group text-left">
                 <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
                   <Headphones size={20} />
                 </div>
@@ -83,13 +89,13 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose, onNavigate
           <div className="px-4 py-4">
             <h3 className="px-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Help & Support</h3>
             <div className="flex flex-col gap-1">
-              <button className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group">
+              <button className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group text-left w-full">
                 <div className="flex items-center gap-3">
                   <HelpCircle size={18} className="text-gray-400 group-hover:text-white" />
                   <span className="text-sm font-medium text-gray-300 group-hover:text-white">Contact Us</span>
                 </div>
               </button>
-              <button className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group">
+              <button className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group text-left w-full">
                 <div className="flex items-center gap-3">
                   <FileText size={18} className="text-gray-400 group-hover:text-white" />
                   <span className="text-sm font-medium text-gray-300 group-hover:text-white">Terms of Service</span>
@@ -104,7 +110,7 @@ export const SideMenu: React.FC<SideMenuProps> = ({ visible, onClose, onNavigate
           <div className="px-4 py-4">
             <h3 className="px-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">App Settings</h3>
             <div className="flex flex-col gap-1">
-              <button className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group">
+              <button className="flex items-center justify-between px-3 py-3 rounded-xl hover:bg-neutral-800 transition-colors group text-left w-full">
                 <div className="flex items-center gap-3">
                   <Settings size={18} className="text-gray-400 group-hover:text-white" />
                   <span className="text-sm font-medium text-gray-300 group-hover:text-white">Settings</span>

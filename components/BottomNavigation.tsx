@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Store, Scale, Heart, User, Bot } from 'lucide-react';
+import { Home, Store, Scale, Heart, User } from 'lucide-react';
 
 interface BottomNavigationProps {
   activeTab: string;
@@ -40,55 +40,42 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   };
 
   return (
-    <>
-      <nav className="w-full bg-neutral-900/95 backdrop-blur-xl rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] h-[84px] fixed bottom-0 z-50 max-w-md left-1/2 -translate-x-1/2 px-6 pb-2 border-t border-white/5">
-        <div className="flex items-center justify-between h-full w-full relative">
-          
-          {/* 1. Home */}
-          {renderTab('home', Home)}
-          
-          {/* 2. Store */}
-          {renderTab('store', Store)}
-          
-          {/* 3. Center Compare Button (Raised & Animated) */}
-          <div className="relative -top-10 group cursor-pointer z-10">
-             {/* Pulse Ring */}
-             <div className={`absolute inset-0 rounded-full bg-blue-500 opacity-20 blur-xl transition-all duration-1000 ${activeTab === 'compare' ? 'scale-150 animate-pulse' : 'scale-100'}`} />
-             
-             <button 
-              onClick={() => onNavigate('compare')}
-              className={`relative w-[72px] h-[72px] rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(37,99,235,0.4)] border-[6px] border-neutral-900 transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) active:scale-90 ${
-                activeTab === 'compare' 
-                  ? 'bg-blue-500 text-white -translate-y-2 shadow-[0_15px_30px_rgba(37,99,235,0.6)]' 
-                  : 'bg-blue-600 text-white hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(37,99,235,0.5)]'
-              }`}
-            >
-              <Scale 
-                size={32} 
-                strokeWidth={2} 
-                className={`transition-transform duration-500 ${activeTab === 'compare' ? 'rotate-[360deg] scale-110' : 'group-hover:scale-110'}`} 
-              />
-            </button>
-          </div>
-          
-          {/* 4. Wishlist */}
-          {renderTab('wishlist', Heart)}
-          
-          {/* 5. Profile */}
-          {renderTab('profile', User)}
+    <nav className="w-full bg-neutral-900/95 backdrop-blur-xl rounded-t-[2.5rem] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)] h-[84px] fixed bottom-0 z-50 max-w-md left-1/2 -translate-x-1/2 px-6 pb-2 border-t border-white/5">
+      <div className="flex items-center justify-between h-full w-full relative">
+        
+        {/* 1. Home */}
+        {renderTab('home', Home)}
+        
+        {/* 2. Store */}
+        {renderTab('store', Store)}
+        
+        {/* 3. Center Compare Button (Raised & Animated) */}
+        <div className="relative -top-10 group cursor-pointer z-10">
+           {/* Pulse Ring */}
+           <div className={`absolute inset-0 rounded-full bg-blue-500 opacity-20 blur-xl transition-all duration-1000 ${activeTab === 'compare' ? 'scale-150 animate-pulse' : 'scale-100'}`} />
+           
+           <button 
+            onClick={() => onNavigate('compare')}
+            className={`relative w-[72px] h-[72px] rounded-full flex items-center justify-center shadow-[0_8px_20px_rgba(37,99,235,0.4)] border-[6px] border-neutral-900 transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) active:scale-90 ${
+              activeTab === 'compare' 
+                ? 'bg-blue-500 text-white -translate-y-2 shadow-[0_15px_30px_rgba(37,99,235,0.6)]' 
+                : 'bg-blue-600 text-white hover:-translate-y-1 hover:shadow-[0_12px_24px_rgba(37,99,235,0.5)]'
+            }`}
+          >
+            <Scale 
+              size={32} 
+              strokeWidth={2} 
+              className={`transition-transform duration-500 ${activeTab === 'compare' ? 'rotate-[360deg] scale-110' : 'group-hover:scale-110'}`} 
+            />
+          </button>
         </div>
-      </nav>
-      
-      {/* Floating Action Button - Only show on Home */}
-      {activeTab === 'home' && (
-        <button className="fixed bottom-28 right-5 z-40 bg-white text-blue-600 w-14 h-14 rounded-2xl shadow-xl shadow-blue-500/20 flex items-center justify-center transition-all duration-500 animate-in slide-in-from-bottom-4 zoom-in hover:scale-110 active:scale-90 group max-w-md left-1/2 ml-[calc(50%-28px+140px)]">
-          <Bot size={28} fill="currentColor" className="group-hover:rotate-12 transition-transform" />
-          <span className="absolute -top-1 -right-1 flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-          </span>
-        </button>
-      )}
-    </>
+        
+        {/* 4. Wishlist */}
+        {renderTab('wishlist', Heart)}
+        
+        {/* 5. Profile */}
+        {renderTab('profile', User)}
+      </div>
+    </nav>
   );
 };

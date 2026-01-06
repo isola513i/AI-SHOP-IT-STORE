@@ -11,6 +11,8 @@ interface CompareProps {
   cartItemCount: number;
   onCartClick: () => void;
   allProducts: Product[];
+  onMenuClick?: () => void;
+  onLogoClick?: () => void;
 }
 
 export const Compare: React.FC<CompareProps> = ({ 
@@ -20,7 +22,9 @@ export const Compare: React.FC<CompareProps> = ({
   onAddToCart,
   cartItemCount,
   onCartClick,
-  allProducts
+  allProducts,
+  onMenuClick,
+  onLogoClick
 }) => {
   const [slot1, setSlot1] = useState<Product | null>(productA || null);
   const [slot2, setSlot2] = useState<Product | null>(productB || null);
@@ -183,7 +187,12 @@ export const Compare: React.FC<CompareProps> = ({
   return (
     <div className="flex flex-col h-full bg-neutral-900 text-white animate-in slide-in-from-right duration-300 relative">
       {/* 1. Navigation Header */}
-      <Header cartCount={cartItemCount} onCartClick={onCartClick} />
+      <Header 
+        cartCount={cartItemCount} 
+        onCartClick={onCartClick} 
+        onMenuClick={onMenuClick}
+        onLogoClick={onLogoClick}
+      />
       
       {/* Spacer for Fixed Header */}
       <div className="h-[60px] shrink-0"></div>
